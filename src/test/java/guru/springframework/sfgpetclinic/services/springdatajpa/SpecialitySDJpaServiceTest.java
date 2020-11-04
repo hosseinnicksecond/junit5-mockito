@@ -38,7 +38,11 @@ class SpecialitySDJpaServiceTest {
     @Test
     void delete() {
 
-        service.delete(new Speciality());
+        Speciality speciality= new Speciality();
+
+        service.delete(speciality);
+
+        verify(repository).delete(any(Speciality.class));
     }
 
     @Test
