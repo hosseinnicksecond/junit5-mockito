@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,15 +26,15 @@ class SpecialitySDJpaServiceTest {
 
     @Test
     void findByIdTest() {
+        //given
         Speciality speciality= new Speciality();
-
         when(repository.findById(1L)).thenReturn(Optional.of(speciality));
-
+        //when
         Speciality foundSpeciality=service.findById(1L);
-
+        //then
         assertThat(foundSpeciality).isNotNull();
-
-        verify(repository).findById(1L);
+        then(repository).should(times(1)).findById(anyLong());
+        then(repository).shouldHaveNoMoreInteractions();
     }
 
     @Test
