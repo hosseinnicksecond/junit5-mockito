@@ -15,9 +15,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -95,5 +95,33 @@ class VisitSDJpaServiceTest {
         service.deleteById(1L);
 
         then(repository).should(times(2)).deleteById(anyLong());
+    }
+
+    @Test
+    void testDeleteThrow() {
+        doThrow(new RuntimeException("Boom")).when(repository).delete(any(Visit.class));
+
+        assertThrows(RuntimeException.class,()->repository.delete(new Visit()));
+
+        verify(repository).delete(any());
+    }
+
+    @Test
+    void testFindByIdBddThrow() {
+        given(repository.findById(anyLong())).willThrow(new RuntimeException("Boom"));
+
+        assertThrows(RuntimeException.class,()->repository.findById(1L));
+
+        then(repository).should().findById(anyLong());
+    }
+
+    @Test
+    void testDeleteThrowBDD() {
+
+        willThrow(new RuntimeException("Boom")).given(repository).delete(any(Visit.class));
+
+        assertThrows(RuntimeException.class,()->repository.delete(new Visit()));
+
+        then(repository).should().delete(any());
     }
 }
