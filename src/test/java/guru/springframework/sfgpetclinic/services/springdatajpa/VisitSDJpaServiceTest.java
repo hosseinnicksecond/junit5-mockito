@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,6 +71,17 @@ class VisitSDJpaServiceTest {
         verify(repository).save(visit);
 
         assertThat(visit1).isEqualTo(visit);
+    }
+
+    @Test
+    void testSaveBDD(){
+        given(repository.save(visit)).willReturn(null);
+
+        visit1=service.save(visit);
+
+        verify(repository).save(visit);
+
+//        assertThat(visit1).isNotNull();
     }
 
     @Test
