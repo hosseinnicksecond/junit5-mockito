@@ -11,14 +11,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SpecialitySDJpaServiceTest {
 
-    @Mock
+    @Mock(lenient = true)
     SpecialtyRepository repository;
 
     @InjectMocks
@@ -27,19 +27,20 @@ class SpecialitySDJpaServiceTest {
     @Test
     void findByIdTest() {
         //given
-        Speciality speciality= new Speciality();
-      given(repository.findById(anyLong())).willReturn(Optional.of(speciality));
+        Speciality speciality = new Speciality();
+        given(repository.findById(anyLong())).willReturn(Optional.of(speciality));
         //when
-        Speciality foundSpeciality=service.findById(1L);
+        Speciality foundSpeciality = service.findById(1L);
         //then
         assertThat(foundSpeciality).isNotNull();
         then(repository).should(times(1)).findById(anyLong());
         then(repository).shouldHaveNoMoreInteractions();
     }
+
     @Test
     void delete() {
         //given
-        Speciality speciality= new Speciality();
+        Speciality speciality = new Speciality();
         //when
         service.delete(speciality);
 
@@ -91,5 +92,45 @@ class SpecialitySDJpaServiceTest {
         then(repository).should(never()).deleteById(5L);
     }
 
+    @Test
+    void testWithArgumentOnStubbing() {
+        //given
+        final String Description = "MATCH";
+        Speciality speciality = new Speciality();
+        speciality.setDescription(Description);
 
+        Speciality shouldReturnFromSaveMethod = new Speciality();
+        shouldReturnFromSaveMethod.setId(1L);
+
+        given(repository.save(argThat(s -> s.getDescription().equals(Description))))
+                .willReturn(shouldReturnFromSaveMethod);
+        //when
+        Speciality returnValue=service.save(speciality);
+
+        //then
+        assertThat(returnValue.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void testWithArgumentOnStubbingNoMatch() {
+        //given
+        final String Description="MATCH";
+        Speciality speciality= new Speciality();
+        speciality.setDescription(Description);
+
+        Speciality shouldReturnFromSaveMethod=new Speciality();
+        shouldReturnFromSaveMethod.setId(1L);
+
+        given(repository.save(argThat(s->s.getDescription().equals("no match"))))
+                .willReturn(shouldReturnFromSaveMethod);
+
+
+        //when
+        Speciality returnValue=service.save(speciality);
+
+        //then
+        assertNull(returnValue);
+
+
+    }
 }
