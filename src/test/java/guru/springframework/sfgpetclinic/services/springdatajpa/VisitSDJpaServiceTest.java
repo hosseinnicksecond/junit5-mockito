@@ -17,6 +17,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,67 +39,61 @@ class VisitSDJpaServiceTest {
 
 
     @Test
-    void findAll() {
+    void findAllBDD() {
+        //given
         Set<Visit> visits= new HashSet<>();
         visits.add(visit);
-
-//       when(repository.findAll()).thenReturn(visits);
-        doReturn(visits).when(repository).findAll();
+        given(repository.findAll()).willReturn(visits);
+        //when
         Set<Visit> found=service.findAll();
 
-        verify(repository).findAll();
-
+        //then
+        then(repository).should().findAll();
         assertThat(found).hasSize(1);
     }
 
     @Test
-    void findById() {
+    void findByIdBDD() {
 
-        when(repository.findById(anyLong())).thenReturn(Optional.of(visit));
-
+        //given
+        given(repository.findById(anyLong())).willReturn(Optional.of(visit));
+        //when
         visit1=service.findById(1L);
-        verify(repository).findById(anyLong());
+        //then
+        then(repository).should(times(1)).findById(anyLong());
         assertThat(visit1).isNotNull();
     }
 
     @Test
-    void save() {
-
-        when(repository.save(any(Visit.class))).thenReturn(visit);
-
+    void saveBDD() {
+        //given
+        given(repository.save(visit)).willReturn(visit);
+        //when
         visit1=service.save(visit);
-
-        verify(repository).save(visit);
-
+        //then
+        then(repository).should().save(any(Visit.class));
         assertThat(visit1).isEqualTo(visit);
     }
 
     @Test
-    void testSaveBDD(){
-        given(repository.save(visit)).willReturn(null);
+    void deleteBDD() {
+        //given-- none
 
-        visit1=service.save(visit);
-
-        verify(repository).save(visit);
-
-//        assertThat(visit1).isNotNull();
-    }
-
-    @Test
-    void delete() {
-
+        //when
         service.delete(visit);
-
-        verify(repository).delete(visit);
+        //then
+        then(repository).should().delete(any(Visit.class));
 
     }
 
     @Test
-    void deleteById() {
+    void deleteByIdBDD() {
+        //given - none
 
+        //when
         service.deleteById(1L);
         service.deleteById(1L);
 
-        verify(repository,times(2)).deleteById(anyLong());
+        then(repository).should(times(2)).deleteById(anyLong());
     }
 }
