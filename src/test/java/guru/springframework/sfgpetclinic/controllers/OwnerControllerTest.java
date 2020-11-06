@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OwnerControllerTest {
@@ -72,6 +73,7 @@ class OwnerControllerTest {
 
         assertThat("%not found%").isEqualTo(stringArgumentCaptor.getValue());
         assertThat("owners/findOwners").isEqualTo(view);
+        verifyNoInteractions(model);
     }
 
     @Test
@@ -81,11 +83,14 @@ class OwnerControllerTest {
 
         String view= controller.processFindForm(owner,result,model);
 
+
         assertThat("%found more%").isEqualTo(stringArgumentCaptor.getValue());
         assertThat("owners/ownersList").isEqualTo(view);
 
         inOrder.verify(service).findAllByLastNameLike(anyString());
         inOrder.verify(model).addAttribute(anyString(),any());
+        verifyNoMoreInteractions(service);
+
     }
 
     @Test
@@ -100,6 +105,7 @@ class OwnerControllerTest {
 
         assertThat(stringArgumentCaptor.getValue()).isEqualTo("%Doe%");
         assertThat("redirect:/owners/1").isEqualTo(view);
+        verifyNoInteractions(model);
     }
 
     @Test
